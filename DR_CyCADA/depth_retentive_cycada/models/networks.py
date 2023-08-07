@@ -237,10 +237,21 @@ def define_C(input_nc, netC, init_type='normal', init_gain=0.02, gpu_ids=[]):
     elif netC == "d_ft":
         net = FeatureDiscriminator()
     elif netC == "d_dpt":
-        net = DepthDiscriminator()
+        net = PixelDiscriminator(input_nc)
     else:
         raise NotImplementedError
     return init_net(net, init_type, init_gain, gpu_ids)
+
+def define_P(model_type="DPT_Large"):
+    midas_transforms = torch.hub.load("intel-isl/MiDaS", "transforms")
+
+    if model_type == "DPT_Large" or model_type == "DPT_Hybrid":
+        transform = midas_transforms.dpt_transform
+    else:
+        transform = midas_transforms.small_transform
+
+
+    return torch.hub.load("intel-isl/MiDaS",model_type), transform
 
 ##############################################################################
 # Classes
