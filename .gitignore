@@ -1,0 +1,6 @@
+depth_retentive_cycada/checkpoints
+depth_retentive_cycada/models/pretrain
+depth_retentive_cycada/data/habitat_dataset_dr_cycada
+depth_retentive_cycada/data/gen_dataset/raw
+**/__pycache__/
+
