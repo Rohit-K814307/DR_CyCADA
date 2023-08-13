@@ -11,6 +11,9 @@ import os
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+def norm(inp):
+    return (inp / torch.max(inp))
+
 def eval(G_A_path="checkpoints/drcycada_2_0/models/240_net_G_A.pth", 
          G_B_path="checkpoints/drcycada_2_0/models/240_net_G_B.pth",
          dataroot="./data/habitat_dataset_dr_cycada",
@@ -85,17 +88,17 @@ def eval(G_A_path="checkpoints/drcycada_2_0/models/240_net_G_A.pth",
         A = data["A"].detach().to(device)
         B = data["B"].detach().to(device)
 
-        true_depth = midas(A).detach()
+        true_depth = midas(norm(A)).detach()
 
         A_hat = netG_A(B).detach()
 
-        pred_depth = midas(A_hat).detach()
+        pred_depth = midas(norm(A_hat)).detach()
 
         B_hat = netG_A(A_hat).detach()
 
-        B_depth = midas(B).detach()
+        B_depth = midas(norm(B)).detach()
 
-        B_hat_depth = midas(B_hat).detach()
+        B_hat_depth = midas(norm(B_hat)).detach()
 
         #calculate depth loss
         depth_loss = loss_fn(true_depth, pred_depth)
@@ -250,17 +253,18 @@ def compare_losses():
 
 def evaluate_all():
     # eval drcycada
-    eval()
+    eval(show_images=True,
+        save=False)
 
 
-    # eval cycada
-    eval(G_A_path="./checkpoints/cycada_2_0/models/10_net_G_A.pth",
-        G_B_path="./checkpoints/cycada_2_0/models/10_net_G_B.pth",
-        model_name="cyclegan")
+    # # eval cycada
+    # eval(G_A_path="./checkpoints/cyclegan_2_0/models/10_net_G_A.pth",
+    #     G_B_path="./checkpoints/cyclegan_2_0/models/10_net_G_B.pth",
+    #     model_name="cycada")
 
 
-    #compare losses
-    compare_losses()
+    # #compare losses
+    # compare_losses()
 
 if __name__ == "__main__":
     evaluate_all()
